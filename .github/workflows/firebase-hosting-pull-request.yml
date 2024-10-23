@@ -21,11 +21,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Moving Files...
-        run: |
-          cd public
-          cp -r build/* ./
-
       - name: Deploying...
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
