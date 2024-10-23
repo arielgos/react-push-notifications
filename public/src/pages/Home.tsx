@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth, requestNotificationPermission, registerServiceWorker, getFCM } from "../helpers/Firebase";
+import { auth, requestNotificationPermission, registerServiceWorker, getFCM, firestore } from "../helpers/Firebase";
 import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { CONSTANTS, STORAGE } from "../helpers/Constants";
+import { setDoc, doc, Timestamp } from "firebase/firestore";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -22,6 +23,15 @@ export default function Home() {
         console.error("Error", error.message, error);
       });
   };
+
+  useEffect(() => {
+    if (!user) return;
+    setDoc(doc(firestore, STORAGE.TOKEN, user?.uid), {
+      user: user?.email,
+      fcm: localStorage.getItem(STORAGE.FCM) ?? "",
+      time: Timestamp.fromDate(new Date()).toMillis(),
+    });
+  }, [user]);
 
   useEffect(() => {
     if (dataFetchedReference.current) return;

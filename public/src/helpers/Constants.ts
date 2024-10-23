@@ -4,4 +4,5 @@ export const CONSTANTS = {
 
 export const STORAGE = {
   FCM: "fcm",
+  TOKEN: "token",
 };
