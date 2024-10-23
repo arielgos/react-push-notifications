@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth, requestNotificationPermission, registerServiceWorker, getFCM } from "../helpers/Firebase";
 import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { CONSTANTS, STORAGE } from "../helpers/Constants";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import { NavbarText } from "react-bootstrap";
 
 export default function Home() {
   const navigate = useNavigate();
