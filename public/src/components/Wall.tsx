@@ -1,8 +1,8 @@
 import { User } from "firebase/auth";
 import { ChangeEvent, FC, useEffect, useState } from "react";
-import { STORAGE } from "../helpers/Constants";
+import { CONFIGURATION, STORAGE } from "../helpers/Constants";
 import { firestore, storage } from "../helpers/Firebase";
-import { collection, orderBy, onSnapshot, query } from "firebase/firestore";
+import { collection, orderBy, onSnapshot, query, setDoc, doc } from "firebase/firestore";
 import { Notification } from "../models/Models";
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
@@ -13,6 +13,7 @@ import Spinner from "react-bootstrap/Spinner";
 import Item from "./Item";
 import Compressor from "compressorjs";
 import { uploadBytes, ref } from "firebase/storage";
+import { InputGroup } from "react-bootstrap";
 
 interface WallProps {
   user: User;
@@ -22,6 +23,7 @@ const Wall: FC<WallProps> = (props) => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [labels, setLabels] = useState("");
 
   useEffect(() => {
     const reference = collection(firestore, STORAGE.NOTIFICATION);
@@ -36,6 +38,14 @@ const Wall: FC<WallProps> = (props) => {
         setLoading(false);
       }
     });
+
+    onSnapshot(query(collection(firestore, STORAGE.CONFIGURATION)), (snapshot) => {
+      const notifications: Notification[] = [];
+      snapshot.forEach((doc) => {
+        setLabels(doc.data().value);
+      });
+    });
+
     return () => unsubscribe();
   }, [loading]);
 
@@ -79,10 +89,28 @@ const Wall: FC<WallProps> = (props) => {
 
   return (
     <Container>
+      <Form onSubmit={(event) => event.preventDefault()} className="my-3">
+        <Form.Group className="mb-3" controlId="text">
+          <InputGroup>
+            <InputGroup.Text>Etiquetas a analizar</InputGroup.Text>
+            <Form.Control
+              as="textarea"
+              aria-label="Etiquetas a Analizar"
+              value={labels}
+              onChange={async (e) => {
+                setLabels(e.target.value);
+                await setDoc(doc(firestore, STORAGE.CONFIGURATION, CONFIGURATION.LABEL), {
+                  value: e.target.value.split(","),
+                });
+              }}
+            />
+          </InputGroup>
+        </Form.Group>
+      </Form>
       {!uploading && (
-        <Form onSubmit={() => {}} className="my-3">
+        <Form onSubmit={(event) => event.preventDefault()} className="my-3">
           <Form.Group className="mb-3" controlId="text">
-            <Form.Label>Archivo a analizar</Form.Label>
+            <Form.Label>Subir archivo a Revisión</Form.Label>
             <Form.Control
               type="file"
               onChange={(event) => handleImage(event as ChangeEvent<HTMLInputElement>)}

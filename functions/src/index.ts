@@ -31,7 +31,7 @@ export const callCustomModel = onObjectFinalized({ cpu: 2 }, async (event) => {
     const [result] = await client.labelDetection(`gs://${bucketName}/${filePath}`);
     const labels = result.labelAnnotations;
     if (labels) {
-      const labelNames = labels.map((label) => label.description).join(",");
+      const labelNames = labels.map((label) => label.description).join(", ");
       await firestore()
         .collection(NOTIFICATION)
         .add({
