@@ -3,7 +3,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
+import { getMessaging, getToken, onMessage, isSupported, Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWaPWPiu-9Zrnl6fl315ffMlHS5zEHLb8",
@@ -21,7 +21,13 @@ export const analytics = getAnalytics(app);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
-export const messaging = getMessaging(app);
+let messaging: Messaging | null = null;
+
+try {
+  messaging = getMessaging(app);
+} catch (error) {
+  console.error(error);
+}
 
 export const onMessageListener = (callback: (payload: any) => void) => {
   if (messaging !== null) {
@@ -64,7 +70,7 @@ export const registerServiceWorker = (messageCallback: (payload: any) => void, f
       if (supported) {
         const serviceWorker = navigator.serviceWorker;
         serviceWorker
-          .register("./firebase.messaging.sw.js")
+          .register("./firebase-messaging-sw.js")
           .then((registration) => {
             console.debug("[SW]: SCOPE: ", registration.scope);
             return registration.scope;

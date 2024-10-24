@@ -58,10 +58,14 @@ export default function Home() {
             },
             () => {
               setTimeout(function () {
-                getFCM().then(async (fcm) => {
-                  console.debug(STORAGE.FCM, fcm);
-                  localStorage.setItem(STORAGE.FCM, fcm as string);
-                });
+                getFCM()
+                  .then(async (fcm) => {
+                    console.debug(STORAGE.FCM, fcm);
+                    localStorage.setItem(STORAGE.FCM, fcm as string);
+                  })
+                  .catch((error) => {
+                    console.error("Error", error);
+                  });
               }, 3500);
             }
           );
