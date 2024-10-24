@@ -6,11 +6,15 @@ import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { CONSTANTS, STORAGE } from "../helpers/Constants";
 import { setDoc, doc, Timestamp } from "firebase/firestore";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
+import { Notification } from "../models/Models";
 
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | undefined>();
   const dataFetchedReference = useRef(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const handleLogout = () => {
     signOut(auth)
@@ -20,7 +24,7 @@ export default function Home() {
         localStorage.clear();
       })
       .catch((error) => {
-        console.error("Error", error.message, error);
+        console.error("Error", error);
       });
   };
 
@@ -54,14 +58,22 @@ export default function Home() {
         if (hasPermissions) {
           registerServiceWorker(
             (payload) => {
-              console.log(payload);
+              setNotifications([
+                ...notifications,
+                {
+                  id: payload.data.fcmMessageId,
+                  title: payload.data.notification.title,
+                  message: payload.data.notification.body,
+                },
+              ]);
             },
             () => {
-              setTimeout(function () {
+              const timer = setTimeout(function () {
                 getFCM()
                   .then(async (fcm) => {
                     console.debug(STORAGE.FCM, fcm);
                     localStorage.setItem(STORAGE.FCM, fcm as string);
+                    clearTimeout(timer);
                   })
                   .catch((error) => {
                     console.error("Error", error);
@@ -79,6 +91,21 @@ export default function Home() {
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
+      <ToastContainer className="p-3" position={"top-center"} style={{ zIndex: 1 }}>
+        {notifications.map((notification: Notification) => {
+          return (
+            <Toast
+              onClose={() => setNotifications(notifications.filter((obj) => obj.id != notification.id))}
+              key={notification.id}
+            >
+              <Toast.Header>
+                <strong className="me-auto">{notification.title}</strong>
+              </Toast.Header>
+              <Toast.Body>{notification.message}</Toast.Body>
+            </Toast>
+          );
+        })}
+      </ToastContainer>
       <Container>
         <Navbar.Brand href="#home">{CONSTANTS.title}</Navbar.Brand>
         <Navbar.Toggle />
