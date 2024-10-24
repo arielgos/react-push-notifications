@@ -3,11 +3,16 @@ import { onObjectFinalized } from "firebase-functions/storage";
 import * as logger from "firebase-functions/logger";
 import { onDocumentCreated } from "firebase-functions/firestore";
 import { initializeApp } from "firebase-admin/app";
-import { messaging } from "firebase-admin";
+import { messaging, firestore } from "firebase-admin";
+import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { Timestamp } from "firebase-admin/firestore";
 
 const TOPIC = "firebase-react";
+const NOTIFICATION = "notification";
 
 initializeApp();
+
+const client = new ImageAnnotatorClient();
 
 export const helloWorld = onRequest((request, response) => {
   logger.info("Hello logs!", { structuredData: true });
@@ -16,6 +21,41 @@ export const helloWorld = onRequest((request, response) => {
 
 export const callCustomModel = onObjectFinalized({ cpu: 2 }, async (event) => {
   logger.log("callCustomModel", event);
+  const filePath = event.data.name;
+  const bucketName = event.bucket;
+  if (!filePath) {
+    logger.error("No file path provided.");
+    return null;
+  }
+  try {
+    const [result] = await client.labelDetection(`gs://${bucketName}/${filePath}`);
+    const labels = result.labelAnnotations;
+    if (labels) {
+      const labelNames = labels.map((label) => label.description).join(",");
+      await firestore()
+        .collection(NOTIFICATION)
+        .add({
+          id: event.id,
+          title: filePath,
+          message: labelNames,
+          time: Timestamp.fromDate(new Date()).toMillis(),
+          file: `gs://${bucketName}/${filePath}`,
+        });
+
+      if (labelNames.toLowerCase().includes("fire") || labelNames.toLowerCase().includes("flame")) {
+        const payload = {
+          notification: {
+            title: filePath,
+            body: labelNames,
+          },
+        };
+        await messaging().sendToTopic(TOPIC, payload);
+      }
+    }
+  } catch (error) {
+    logger.error("Error during label detection:", error);
+  }
+  return null;
 });
 
 export const addToTopic = onDocumentCreated("token/{docId}", async (event) => {
@@ -31,4 +71,5 @@ export const addToTopic = onDocumentCreated("token/{docId}", async (event) => {
         logger.error("Error", e);
       });
   }
+  return null;
 });

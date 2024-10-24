@@ -99,7 +99,7 @@ export default function Home() {
           {notifications.map((notification: Notification) => {
             return (
               <Toast
-                onClose={() => setNotifications(notifications.filter((obj) => obj.id != notification.id))}
+                onClose={() => setNotifications(notifications.filter((obj) => obj.id !== notification.id))}
                 key={notification.id}
               >
                 <Toast.Header>
