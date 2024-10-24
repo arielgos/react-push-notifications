@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { CONSTANTS, STORAGE } from "../helpers/Constants";
-import { setDoc, doc, Timestamp } from "firebase/firestore";
+import { Timestamp, addDoc, collection } from "firebase/firestore";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { Notification } from "../models/Models";
@@ -31,7 +31,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!user) return;
-    setDoc(doc(firestore, STORAGE.TOKEN, user?.uid), {
+    addDoc(collection(firestore, STORAGE.TOKEN), {
       user: user?.email,
       fcm: localStorage.getItem(STORAGE.FCM) ?? "",
       time: Timestamp.fromDate(new Date()).toMillis(),
