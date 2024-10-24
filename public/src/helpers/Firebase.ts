@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { FieldPath, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getMessaging, getToken, onMessage, isSupported, Messaging } from "firebase/messaging";
 
@@ -28,6 +28,16 @@ try {
 } catch (error) {
   console.error(error);
 }
+
+export const getPublicUrl = (url: string) => {
+  return (
+    "https://firebasestorage.googleapis.com/v0/b/" +
+    firebaseConfig.storageBucket +
+    "/o" +
+    url.replace("gs://", "").replace(firebaseConfig.storageBucket, "") +
+    "?alt=media"
+  );
+};
 
 export const onMessageListener = (callback: (payload: any) => void) => {
   if (messaging !== null) {
