@@ -9,6 +9,7 @@ import { setDoc, doc, Timestamp } from "firebase/firestore";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { Notification } from "../models/Models";
+import Wall from "../components/Wall";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -64,6 +65,8 @@ export default function Home() {
                   id: payload.data.fcmMessageId,
                   title: payload.data.notification.title,
                   message: payload.data.notification.body,
+                  time: Timestamp.fromDate(new Date()).toMillis(),
+                  file: undefined,
                 },
               ]);
             },
@@ -90,34 +93,37 @@ export default function Home() {
   }, []);
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <ToastContainer className="p-3" position={"top-center"} style={{ zIndex: 1 }}>
-        {notifications.map((notification: Notification) => {
-          return (
-            <Toast
-              onClose={() => setNotifications(notifications.filter((obj) => obj.id != notification.id))}
-              key={notification.id}
-            >
-              <Toast.Header>
-                <strong className="me-auto">{notification.title}</strong>
-              </Toast.Header>
-              <Toast.Body>{notification.message}</Toast.Body>
-            </Toast>
-          );
-        })}
-      </ToastContainer>
-      <Container>
-        <Navbar.Brand href="#home">{CONSTANTS.title}</Navbar.Brand>
-        <Navbar.Toggle />
-        <Navbar.Collapse className="justify-content-end">
-          <Navbar.Text>
-            Bienvenid@:{" "}
-            <span onClick={handleLogout} title="Click para cerrar sesión">
-              {user != null ? user.email : ""}
-            </span>
-          </Navbar.Text>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+    <>
+      <Navbar expand="lg" className="bg-body-tertiary">
+        <ToastContainer className="p-3" position={"top-center"} style={{ zIndex: 1 }}>
+          {notifications.map((notification: Notification) => {
+            return (
+              <Toast
+                onClose={() => setNotifications(notifications.filter((obj) => obj.id != notification.id))}
+                key={notification.id}
+              >
+                <Toast.Header>
+                  <strong className="me-auto">{notification.title}</strong>
+                </Toast.Header>
+                <Toast.Body>{notification.message}</Toast.Body>
+              </Toast>
+            );
+          })}
+        </ToastContainer>
+        <Container>
+          <Navbar.Brand href="#home">{CONSTANTS.title}</Navbar.Brand>
+          <Navbar.Toggle />
+          <Navbar.Collapse className="justify-content-end">
+            <Navbar.Text>
+              Bienvenid@:{" "}
+              <span onClick={handleLogout} title="Click para cerrar sesión">
+                {user != null ? user.email : ""}
+              </span>
+            </Navbar.Text>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      {user && <Wall user={user} />}
+    </>
   );
 }
