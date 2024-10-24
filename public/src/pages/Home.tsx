@@ -59,8 +59,8 @@ export default function Home() {
         if (hasPermissions) {
           registerServiceWorker(
             (payload) => {
-              setNotifications([
-                ...notifications,
+              setNotifications((list) => [
+                ...list,
                 {
                   id: payload.data.fcmMessageId,
                   title: payload.data.notification.title,
