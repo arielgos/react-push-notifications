@@ -48,8 +48,9 @@ export const callCustomModel = onObjectFinalized({ cpu: 2 }, async (event) => {
             title: filePath,
             body: labelNames,
           },
+          topic: TOPIC,
         };
-        await messaging().sendToTopic(TOPIC, payload);
+        await messaging().send(payload);
       }
     }
   } catch (error) {
