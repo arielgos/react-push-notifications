@@ -40,7 +40,6 @@ const Wall: FC<WallProps> = (props) => {
     });
 
     onSnapshot(query(collection(firestore, STORAGE.CONFIGURATION)), (snapshot) => {
-      const notifications: Notification[] = [];
       snapshot.forEach((doc) => {
         setLabels(doc.data().value);
       });
