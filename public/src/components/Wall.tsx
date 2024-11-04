@@ -5,7 +5,6 @@ import { firestore, storage } from "../helpers/Firebase";
 import { collection, orderBy, onSnapshot, query, setDoc, doc } from "firebase/firestore";
 import { Notification } from "../models/Models";
 import Form from "react-bootstrap/Form";
-import Stack from "react-bootstrap/Stack";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -125,11 +124,13 @@ const Wall: FC<WallProps> = (props) => {
           </Col>
         </Row>
       )}
-      <Stack gap={3} hidden={loading}>
+      <Row hidden={loading} md={2} xs={1}>
         {notifications.map((notification) => (
-          <Item key={notification.id} notification={notification} />
+          <Col className="mt-3" key={notification.id}>
+            <Item key={notification.id} notification={notification} />
+          </Col>
         ))}
-      </Stack>
+      </Row>
     </Container>
   );
 };

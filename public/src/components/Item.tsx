@@ -24,9 +24,7 @@ const Item: FC<ItemProps> = (props) => {
           <Col>
             <Card.Title>{props.notification.message}</Card.Title>
             <Card.Subtitle className="mb-2 text-muted">
-              <span className="text-muted small">
-                {Timestamp.fromMillis(props.notification.time).toDate().toUTCString()}
-              </span>
+              {Timestamp.fromMillis(props.notification.time).toDate().toUTCString()}
             </Card.Subtitle>
           </Col>
         </Row>
