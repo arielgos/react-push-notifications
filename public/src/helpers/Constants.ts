@@ -1,5 +1,5 @@
 export const CONSTANTS = {
-  title: "Notificaciones para todos",
+  title: "Firebase + React + Gemini",
 };
 
 export const STORAGE = {
