@@ -14,6 +14,7 @@ import Wall from "../components/Wall";
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | undefined>();
+  const [fcm, setFcm] = useState("");
   const dataFetchedReference = useRef(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -31,12 +32,13 @@ export default function Home() {
 
   useEffect(() => {
     if (!user) return;
+    if (fcm.length < 1) return;
     addDoc(collection(firestore, STORAGE.TOKEN), {
       user: user?.email,
-      fcm: localStorage.getItem(STORAGE.FCM) ?? "",
+      fcm: fcm,
       time: Timestamp.fromDate(new Date()).toMillis(),
     });
-  }, [user]);
+  }, [user, fcm]);
 
   useEffect(() => {
     if (dataFetchedReference.current) return;
@@ -74,8 +76,10 @@ export default function Home() {
               const timer = setTimeout(function () {
                 getFCM()
                   .then(async (fcm) => {
-                    console.debug(STORAGE.FCM, fcm);
-                    localStorage.setItem(STORAGE.FCM, fcm as string);
+                    const token = fcm as string;
+                    console.debug(STORAGE.FCM, token);
+                    localStorage.setItem(STORAGE.FCM, token);
+                    setFcm(token);
                     clearTimeout(timer);
                   })
                   .catch((error) => {
