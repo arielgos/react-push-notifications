@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { NavLink, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -10,7 +10,7 @@ import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Badge from "react-bootstrap/Badge";
 import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
-import { auth } from "../helpers/Firebase";
+import { auth, authProvider } from "../helpers/Firebase";
 import { CONSTANTS } from "../helpers/Constants";
 
 export default function Login() {
@@ -39,6 +39,19 @@ export default function Login() {
     setValidated(true);
   };
 
+  const onGoogleSignIn = async (e: any) => {
+    e.preventDefault();
+    signInWithPopup(auth, authProvider)
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error", error.message, error);
+        setMessage(error.message);
+        setShowAlert(true);
+      });
+  };
+
   return (
     <Container>
       <Row className="pt-5 justify-content-md-center">
@@ -62,7 +75,6 @@ export default function Login() {
                 />
               </FloatingLabel>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="password">
               <InputGroup hasValidation>
                 <FloatingLabel controlId="password" label="Password" className="mb-3">
@@ -81,7 +93,6 @@ export default function Login() {
                 </FloatingLabel>
               </InputGroup>
             </Form.Group>
-
             <p className="text-sm text-center text-secondary">
               Aún no posees una cuenta?{" "}
               <NavLink to="/signup">
@@ -90,6 +101,9 @@ export default function Login() {
             </p>
             <Button variant="primary" type="submit" className="mt-3">
               Ingresar
+            </Button>{" "}
+            <Button variant="secondary" type="submit" className="mt-3" onClick={onGoogleSignIn}>
+              Ingresar con Google
             </Button>
           </Form>
         </Col>

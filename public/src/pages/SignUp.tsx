@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../helpers/Firebase";
+import { auth, authProvider } from "../helpers/Firebase";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -12,6 +12,7 @@ import Badge from "react-bootstrap/Badge";
 import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
 import { CONSTANTS } from "../helpers/Constants";
+import { signInWithPopup } from "firebase/auth";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function SignUp() {
     const form = e.currentTarget;
     e.preventDefault();
     if (form.checkValidity()) {
-      await createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then(() => {
           navigate("/");
         })
@@ -38,6 +39,19 @@ export default function SignUp() {
         });
     }
     setValidated(true);
+  };
+
+  const onGoogleSignUp = (e: any) => {
+    e.preventDefault();
+    signInWithPopup(auth, authProvider)
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error", error.message, error);
+        setMessage(error.message);
+        setShowAlert(true);
+      });
   };
 
   return (
@@ -64,7 +78,6 @@ export default function SignUp() {
               </FloatingLabel>
               <Form.Text className="text-muted">Nunca compartiremos tú correo electrónico con nadie.</Form.Text>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="password">
               <InputGroup hasValidation>
                 <FloatingLabel controlId="password" label="Contraseña" className="mb-3">
@@ -83,11 +96,12 @@ export default function SignUp() {
                 </FloatingLabel>
               </InputGroup>
             </Form.Group>
-
             <Button variant="primary" type="submit" className="mt-3">
               Registrarme
+            </Button>{" "}
+            <Button variant="secondary" type="submit" className="mt-3" onClick={onGoogleSignUp}>
+              Registrarme con Google
             </Button>
-
             <p className="text-sm text-center text-secondary pt-3">
               Ya posees una cuenta?{" "}
               <NavLink to="/login">
