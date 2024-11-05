@@ -5,14 +5,14 @@ import { getStorage } from "firebase/storage";
 import { getMessaging, getToken, onMessage, isSupported, Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDWaPWPiu-9Zrnl6fl315ffMlHS5zEHLb8",
-  authDomain: "pushnotifications-e6b38.firebaseapp.com",
-  projectId: "pushnotifications-e6b38",
-  storageBucket: "pushnotifications-e6b38.appspot.com",
-  messagingSenderId: "152663014685",
-  appId: "1:152663014685:web:92573d2a1e439889e535f4",
-  measurementId: "G-8VH72Q59J1",
-  vapidKey: "BLnDu1Xhh4Eqc7LBIDghJptnJZxjyiEMkt7fdGqPMbMl7KTVEXOMZXxiLu20u-npim_YS6iy_YBFdtqkB_mdhas",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+  vapidKey: process.env.REACT_APP_FIREBASE_WEB_VAPID_KEY,
 };
 
 export const app = initializeApp(firebaseConfig);
@@ -33,7 +33,7 @@ export const getPublicUrl = (url: string) => {
     "https://firebasestorage.googleapis.com/v0/b/" +
     firebaseConfig.storageBucket +
     "/o" +
-    url.replace("gs://", "").replace(firebaseConfig.storageBucket, "") +
+    url.replace("gs://", "").replace(firebaseConfig.storageBucket ?? "", "") +
     "?alt=media"
   );
 };
