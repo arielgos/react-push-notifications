@@ -10,7 +10,7 @@ import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Badge from "react-bootstrap/Badge";
 import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
-import { auth, authProvider } from "../helpers/Firebase";
+import { auth, authProvider, requestNotificationPermission } from "../helpers/Firebase";
 import { CONSTANTS } from "../helpers/Constants";
 
 export default function Login() {
@@ -22,11 +22,29 @@ export default function Login() {
   const [showAlert, setShowAlert] = useState(false);
   const [message, setMessage] = useState("");
 
-  const onLogin = (e: any) => {
+  const onLogin = async (e: any) => {
     const form = e.currentTarget;
     e.preventDefault();
     if (form.checkValidity()) {
-      signInWithEmailAndPassword(auth, email, password)
+      requestNotificationPermission().then(() => {
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Error", error.message, error);
+            setMessage(error.message);
+            setShowAlert(true);
+          });
+      });
+    }
+    setValidated(true);
+  };
+
+  const onGoogleSignIn = (e: any) => {
+    e.preventDefault();
+    requestNotificationPermission().then(() => {
+      signInWithPopup(auth, authProvider)
         .then(() => {
           navigate("/");
         })
@@ -35,21 +53,7 @@ export default function Login() {
           setMessage(error.message);
           setShowAlert(true);
         });
-    }
-    setValidated(true);
-  };
-
-  const onGoogleSignIn = async (e: any) => {
-    e.preventDefault();
-    signInWithPopup(auth, authProvider)
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Error", error.message, error);
-        setMessage(error.message);
-        setShowAlert(true);
-      });
+    });
   };
 
   return (

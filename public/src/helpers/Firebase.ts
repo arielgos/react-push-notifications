@@ -48,13 +48,18 @@ export const onMessageListener = (callback: (payload: any) => void) => {
 
 export const requestNotificationPermission = () =>
   new Promise((resolve, reject) => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        console.debug("Notification permission granted");
-        resolve(true);
-      }
-      reject(false);
-    });
+    if (Notification.permission === "granted") {
+      console.debug("Notification permission granted");
+      resolve(true);
+    } else if (Notification.permission === "default") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          console.debug("Notification permission granted");
+          resolve(true);
+        }
+        reject(false);
+      });
+    }
   });
 
 export const getFCM = () =>

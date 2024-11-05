@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, authProvider } from "../helpers/Firebase";
+import { auth, authProvider, requestNotificationPermission } from "../helpers/Firebase";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -28,7 +28,25 @@ export default function SignUp() {
     const form = e.currentTarget;
     e.preventDefault();
     if (form.checkValidity()) {
-      createUserWithEmailAndPassword(auth, email, password)
+      requestNotificationPermission().then(() => {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Error", error.message, error);
+            setMessage(error.message);
+            setShowAlert(true);
+          });
+      });
+    }
+    setValidated(true);
+  };
+
+  const onGoogleSignUp = (e: any) => {
+    e.preventDefault();
+    requestNotificationPermission().then(() => {
+      signInWithPopup(auth, authProvider)
         .then(() => {
           navigate("/");
         })
@@ -37,21 +55,7 @@ export default function SignUp() {
           setMessage(error.message);
           setShowAlert(true);
         });
-    }
-    setValidated(true);
-  };
-
-  const onGoogleSignUp = (e: any) => {
-    e.preventDefault();
-    signInWithPopup(auth, authProvider)
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Error", error.message, error);
-        setMessage(error.message);
-        setShowAlert(true);
-      });
+    });
   };
 
   return (
