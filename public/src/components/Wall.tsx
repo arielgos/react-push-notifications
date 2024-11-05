@@ -126,9 +126,7 @@ const Wall: FC<WallProps> = (props) => {
       )}
       <Row hidden={loading} md={2} xs={1}>
         {notifications.map((notification) => (
-          <Col className="mt-3" key={notification.id}>
-            <Item key={notification.id} notification={notification} />
-          </Col>
+          <Item key={notification.id} notification={notification} />
         ))}
       </Row>
     </Container>
