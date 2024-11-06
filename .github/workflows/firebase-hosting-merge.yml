@@ -18,7 +18,8 @@ jobs:
       REACT_APP_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
       REACT_APP_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
       REACT_APP_FIREBASE_WEB_VAPID_KEY: ${{ secrets.FIREBASE_WEB_VAPID_KEY }}
-      
+      REACT_APP_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY}}
+
     steps:
       - name: Checkout...
         uses: actions/checkout@v4
