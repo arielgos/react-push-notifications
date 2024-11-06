@@ -148,7 +148,7 @@ const Wall: FC<WallProps> = (props) => {
       <Form onSubmit={(event) => event.preventDefault()} className="my-3">
         <Form.Group className="mb-3">
           <InputGroup>
-            <InputGroup.Text>Prompt</InputGroup.Text>
+            <InputGroup.Text>Gemini Prompt</InputGroup.Text>
             <Form.Control
               as="textarea"
               aria-label="Prompt"
