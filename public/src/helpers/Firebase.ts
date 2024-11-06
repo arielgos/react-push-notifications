@@ -38,6 +38,10 @@ export const getPublicUrl = (url: string) => {
   );
 };
 
+export const getPublicUrlWithPath = (path: string) => {
+  return "https://firebasestorage.googleapis.com/v0/b/" + firebaseConfig.storageBucket + "/o/" + path + "?alt=media";
+};
+
 export const onMessageListener = (callback: (payload: any) => void) => {
   if (messaging !== null) {
     onMessage(messaging, (payload) => {

@@ -11,4 +11,5 @@ export const STORAGE = {
 
 export const CONFIGURATION = {
   LABEL: "label",
+  PROMPT: "prompt",
 };

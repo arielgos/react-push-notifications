@@ -13,6 +13,8 @@ import Item from "./Item";
 import Compressor from "compressorjs";
 import { uploadBytes, ref } from "firebase/storage";
 import { InputGroup } from "react-bootstrap";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Alert } from "react-bootstrap";
 
 interface WallProps {
   user: User;
@@ -23,6 +25,8 @@ const Wall: FC<WallProps> = (props) => {
   const [uploading, setUploading] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [labels, setLabels] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [geminiResult, setGeminiResult] = useState("");
 
   useEffect(() => {
     const reference = collection(firestore, STORAGE.NOTIFICATION);
@@ -40,12 +44,63 @@ const Wall: FC<WallProps> = (props) => {
 
     onSnapshot(query(collection(firestore, STORAGE.CONFIGURATION)), (snapshot) => {
       snapshot.forEach((doc) => {
-        setLabels(doc.data().value);
+        if (doc.id === CONFIGURATION.LABEL) {
+          setLabels(doc.data().value);
+        } else {
+          setPrompt(doc.data().value);
+        }
       });
     });
 
     return () => unsubscribe();
   }, [loading]);
+
+  const callGemini = async (type: string, file64: string) => {
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY ?? "";
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+    const generationConfig = {
+      temperature: 1,
+      topP: 0.95,
+      topK: 64,
+      maxOutputTokens: 8192,
+      responseMimeType: "text/plain",
+    };
+    const chatSession = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {
+              inlineData: {
+                mimeType: type,
+                data: file64,
+              },
+            },
+          ],
+        },
+      ],
+    });
+    const result = await chatSession.sendMessage(prompt);
+    setGeminiResult(result.response.text());
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleImage = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files?.[0];
@@ -58,10 +113,13 @@ const Wall: FC<WallProps> = (props) => {
       width: 480,
       quality: 0.75,
       async success(result) {
+        convertFileToBase64(result as File).then((base64) => {
+          callGemini(result.type, base64.split(",")[1]);
+        });
         console.log("Compressed image...");
         console.log("Uploading image...");
         let reference = ref(storage, fileName);
-        await uploadBytes(reference, result).then((_) => {
+        await uploadBytes(reference, result).then((result) => {
           console.log("Uploaded image!");
           setUploading(false);
         });
@@ -88,7 +146,26 @@ const Wall: FC<WallProps> = (props) => {
   return (
     <Container>
       <Form onSubmit={(event) => event.preventDefault()} className="my-3">
-        <Form.Group className="mb-3" controlId="text">
+        <Form.Group className="mb-3">
+          <InputGroup>
+            <InputGroup.Text>Prompt</InputGroup.Text>
+            <Form.Control
+              as="textarea"
+              aria-label="Prompt"
+              value={prompt}
+              onChange={async (e) => {
+                setPrompt(e.target.value);
+                await setDoc(doc(firestore, STORAGE.CONFIGURATION, CONFIGURATION.PROMPT), {
+                  value: e.target.value.split(","),
+                });
+              }}
+            />
+          </InputGroup>
+        </Form.Group>
+        {!uploading && geminiResult.length > 0 && (
+          <Alert variant={geminiResult.includes("ALERT") ? "danger" : "primary"}>{geminiResult}</Alert>
+        )}
+        <Form.Group className="mb-3">
           <InputGroup>
             <InputGroup.Text>Etiquetas a analizar</InputGroup.Text>
             <Form.Control
