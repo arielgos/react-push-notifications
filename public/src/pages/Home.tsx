@@ -142,7 +142,7 @@ export default function Home() {
       {!isSupported() && (
         <Container className="mt-3">
           <Alert variant="danger" onClick={enabledPushNotifications}>
-            Las Notificaciones push no son soportadas por tú dispositivo
+            Las notificaciones push no son soportadas por tú dispositivo
           </Alert>
         </Container>
       )}
