@@ -66,7 +66,6 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
-      if (!pushEnabled) return;
       requestNotificationPermission().then((hasPermissions) => {
         if (hasPermissions) {
           registerServiceWorker(
