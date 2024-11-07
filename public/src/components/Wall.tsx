@@ -151,6 +151,7 @@ const Wall: FC<WallProps> = (props) => {
             <InputGroup.Text>Gemini Prompt</InputGroup.Text>
             <Form.Control
               as="textarea"
+              rows={3}
               aria-label="Prompt"
               value={prompt}
               onChange={async (e) => {
