@@ -139,7 +139,14 @@ export default function Home() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {!pushEnabled && (
+      {!isSupported() && (
+        <Container className="mt-3">
+          <Alert variant="danger" onClick={enabledPushNotifications}>
+            Las Notificaciones push no son soportadas por tú dispositivo
+          </Alert>
+        </Container>
+      )}
+      {isSupported() && !pushEnabled && (
         <Container className="mt-3">
           <Alert variant="warning" onClick={enabledPushNotifications}>
             Para habilitar notificaciones push (Click Aquí)
