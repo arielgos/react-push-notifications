@@ -12,13 +12,15 @@ import { Photo } from "../models/Models";
 import Wall from "../components/Wall";
 import { Alert } from "react-bootstrap";
 
+const isSupported = () => "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | undefined>();
   const [fcm, setFcm] = useState("");
   const dataFetchedReference = useRef(false);
   const [notifications, setNotifications] = useState<Photo[]>([]);
-  const pushEnabled = Notification.permission === "granted";
+  const pushEnabled = isSupported() ? Notification.permission === "granted" : false;
 
   const handleLogout = () => {
     signOut(auth)
