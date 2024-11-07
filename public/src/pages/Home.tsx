@@ -47,7 +47,7 @@ export default function Home() {
       fcm: fcm,
       time: Timestamp.fromDate(new Date()).toMillis(),
     });
-  }, [user, fcm]);
+  }, [user, fcm, pushEnabled]);
 
   useEffect(() => {
     if (dataFetchedReference.current) return;
