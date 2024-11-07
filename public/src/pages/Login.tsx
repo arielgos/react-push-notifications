@@ -10,7 +10,7 @@ import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Badge from "react-bootstrap/Badge";
 import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
-import { auth, authProvider, requestNotificationPermission } from "../helpers/Firebase";
+import { auth, authProvider } from "../helpers/Firebase";
 import { CONSTANTS } from "../helpers/Constants";
 
 export default function Login() {
@@ -41,17 +41,15 @@ export default function Login() {
 
   const onGoogleSignIn = (e: any) => {
     e.preventDefault();
-    requestNotificationPermission().then(() => {
-      signInWithPopup(auth, authProvider)
-        .then(() => {
-          navigate("/");
-        })
-        .catch((error) => {
-          console.error("Error", error.message, error);
-          setMessage(error.message);
-          setShowAlert(true);
-        });
-    });
+    signInWithPopup(auth, authProvider)
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error", error.message, error);
+        setMessage(error.message);
+        setShowAlert(true);
+      });
   };
 
   return (

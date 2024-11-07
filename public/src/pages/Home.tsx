@@ -64,6 +64,7 @@ export default function Home() {
   }, [navigate]);
 
   useEffect(() => {
+    if (!pushEnabled) return;
     let isMounted = true;
     if (isMounted) {
       requestNotificationPermission().then((hasPermissions) => {
@@ -103,7 +104,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [pushEnabled]);
 
   return (
     <>
@@ -139,7 +140,7 @@ export default function Home() {
       {!pushEnabled && (
         <Container className="mt-3">
           <Alert variant="warning" onClick={enabledPushNotifications}>
-            Habilitar Notificaciones (Click Aquí)
+            Para habilitar notificaciones push (Click Aquí)
           </Alert>
         </Container>
       )}
