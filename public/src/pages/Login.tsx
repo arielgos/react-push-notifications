@@ -26,17 +26,15 @@ export default function Login() {
     const form = e.currentTarget;
     e.preventDefault();
     if (form.checkValidity()) {
-      requestNotificationPermission().then(() => {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            navigate("/");
-          })
-          .catch((error) => {
-            console.error("Error", error.message, error);
-            setMessage(error.message);
-            setShowAlert(true);
-          });
-      });
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          navigate("/");
+        })
+        .catch((error) => {
+          console.error("Error", error.message, error);
+          setMessage(error.message);
+          setShowAlert(true);
+        });
     }
     setValidated(true);
   };

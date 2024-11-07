@@ -8,15 +8,17 @@ import { CONSTANTS, STORAGE } from "../helpers/Constants";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
-import { Notification } from "../models/Models";
+import { Photo } from "../models/Models";
 import Wall from "../components/Wall";
+import { Alert } from "react-bootstrap";
 
 export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | undefined>();
   const [fcm, setFcm] = useState("");
   const dataFetchedReference = useRef(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Photo[]>([]);
+  const pushEnabled = Notification.permission === "granted";
 
   const handleLogout = () => {
     signOut(auth)
@@ -30,15 +32,22 @@ export default function Home() {
       });
   };
 
+  const enabledPushNotifications = () => {
+    requestNotificationPermission().then((_) => {
+      navigate(0);
+    });
+  };
+
   useEffect(() => {
     if (!user) return;
+    if (!pushEnabled) return;
     if (fcm.length < 1) return;
     addDoc(collection(firestore, STORAGE.TOKEN), {
       user: user?.email,
       fcm: fcm,
       time: Timestamp.fromDate(new Date()).toMillis(),
     });
-  }, [user, fcm]);
+  }, [user, fcm, pushEnabled]);
 
   useEffect(() => {
     if (dataFetchedReference.current) return;
@@ -57,6 +66,7 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
+      if (!pushEnabled) return;
       requestNotificationPermission().then((hasPermissions) => {
         if (hasPermissions) {
           registerServiceWorker(
@@ -100,7 +110,7 @@ export default function Home() {
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
         <ToastContainer className="p-3" position={"top-center"} style={{ zIndex: 1 }}>
-          {notifications.map((notification: Notification) => {
+          {notifications.map((notification: Photo) => {
             return (
               <Toast
                 onClose={() => setNotifications(notifications.filter((obj) => obj.id !== notification.id))}
@@ -127,6 +137,13 @@ export default function Home() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      {!pushEnabled && (
+        <Container className="mt-3">
+          <Alert variant="warning" onClick={enabledPushNotifications}>
+            Habilitar Notificaciones (Click Aquí)
+          </Alert>
+        </Container>
+      )}
       {user && <Wall user={user} />}
     </>
   );

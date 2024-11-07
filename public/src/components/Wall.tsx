@@ -3,7 +3,7 @@ import { ChangeEvent, FC, useEffect, useState } from "react";
 import { CONFIGURATION, STORAGE } from "../helpers/Constants";
 import { firestore, storage } from "../helpers/Firebase";
 import { collection, orderBy, onSnapshot, query, setDoc, doc } from "firebase/firestore";
-import { Notification } from "../models/Models";
+import { Photo } from "../models/Models";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
@@ -23,7 +23,7 @@ interface WallProps {
 const Wall: FC<WallProps> = (props) => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Photo[]>([]);
   const [labels, setLabels] = useState("");
   const [prompt, setPrompt] = useState("");
   const [geminiResult, setGeminiResult] = useState("");
@@ -32,9 +32,9 @@ const Wall: FC<WallProps> = (props) => {
     const reference = collection(firestore, STORAGE.NOTIFICATION);
     const q = query(reference, orderBy("time", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notifications: Notification[] = [];
+      const notifications: Photo[] = [];
       snapshot.forEach((doc) => {
-        notifications.push(doc.data() as Notification);
+        notifications.push(doc.data() as Photo);
       });
       setNotifications(notifications);
       if (loading) {

@@ -1,4 +1,4 @@
-export interface Notification {
+export interface Photo {
   id: string;
   title: string;
   message: string;

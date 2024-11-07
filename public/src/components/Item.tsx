@@ -1,13 +1,13 @@
 import { Timestamp } from "firebase/firestore";
 import Card from "react-bootstrap/Card";
 import { FC } from "react";
-import { Notification } from "../models/Models";
+import { Photo } from "../models/Models";
 import { getPublicUrl } from "../helpers/Firebase";
 import Image from "react-bootstrap/Image";
 import { Row, Col } from "react-bootstrap";
 
 interface ItemProps {
-  notification: Notification;
+  notification: Photo;
 }
 
 const Item: FC<ItemProps> = (props) => {
