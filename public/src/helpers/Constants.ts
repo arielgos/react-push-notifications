@@ -12,4 +12,7 @@ export const STORAGE = {
 export const CONFIGURATION = {
   LABEL: "label",
   PROMPT: "prompt",
+  DISABLED: "disabled",
 };
+
+export const userId = "e7xSiEAym7YJrZoOYVbaYARpCmv2";
