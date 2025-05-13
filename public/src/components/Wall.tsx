@@ -1,6 +1,6 @@
 import { User } from "firebase/auth";
 import { ChangeEvent, FC, useEffect, useState } from "react";
-import { CONFIGURATION, STORAGE, userId } from "../helpers/Constants";
+import { CONFIGURATION, STORAGE } from "../helpers/Constants";
 import { firestore, storage } from "../helpers/Firebase";
 import { collection, orderBy, onSnapshot, query, setDoc, doc } from "firebase/firestore";
 import { Photo } from "../models/Models";
@@ -28,6 +28,7 @@ const Wall: FC<WallProps> = (props) => {
   const [prompt, setPrompt] = useState("");
   const [disabled, setDisabled] = useState(true);
   const [geminiResult, setGeminiResult] = useState("");
+  const [admin, setAdmin] = useState("");
 
   useEffect(() => {
     const reference = collection(firestore, STORAGE.NOTIFICATION);
@@ -49,7 +50,9 @@ const Wall: FC<WallProps> = (props) => {
           setLabels(doc.data().value);
         } else if (doc.id === CONFIGURATION.PROMPT) {
           setPrompt(doc.data().value);
-        } else {
+        } else if (doc.id === CONFIGURATION.ADMIN) {
+          setAdmin(doc.data().value);
+        } else if (doc.id === CONFIGURATION.DISABLED) {
           setDisabled(doc.data().value);
         }
       });
@@ -146,7 +149,7 @@ const Wall: FC<WallProps> = (props) => {
   return (
     <Container>
       <Form onSubmit={(event) => event.preventDefault()} className="my-3">
-        {props.user?.uid === userId && (
+        {props.user?.uid === admin && (
           <Form.Group className="mb-3">
             <InputGroup>
               <InputGroup.Text>Gemini Prompt</InputGroup.Text>

@@ -13,6 +13,5 @@ export const CONFIGURATION = {
   LABEL: "label",
   PROMPT: "prompt",
   DISABLED: "disabled",
+  ADMIN: "admin",
 };
-
-export const userId = "e7xSiEAym7YJrZoOYVbaYARpCmv2";
